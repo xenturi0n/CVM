@@ -3,61 +3,14 @@ from django.db import models
 from apps.adscripciones.models import Adscripcion
 from django.utils.encoding import python_2_unicode_compatible
 
-
-class MixinElemento(object):
 #TODO: probar con nombre corto para detallar la adscripcion en lugar de nobre largo
 #Todo: generar un campo automatico para saber si el elemento esta de apoyo
-    @staticmethod
-    def detallar_adscripcion(elemento):
-        ancestro=elemento.adscripcion.get_ancestors(include_self=True)
-        if 0< len(ancestro):
-            elemento.coordinacion=ancestro[0].nombre_cto
-        else:
-            elemento.coordinacion='Comandancia'
-
-        if 1< len(ancestro):
-            elemento.subdireccion=ancestro[1].nombre_cto
-        else:
-            elemento.subdireccion='Comandancia'
-
-        if 2< len(ancestro):
-            elemento.region=ancestro[2].nombre_cto
-        else:
-            elemento.region='Comandancia'
-
-        if 3< len(ancestro):
-            elemento.agrupamiento=ancestro[3].nombre_cto
-        else:
-            elemento.agrupamiento='Comandancia'
-
-        ancestro=elemento.laborando_en.get_ancestors(include_self=True)
-
-        if 0< len(ancestro):
-            elemento.coordinacion_lab=ancestro[0].nombre_cto
-        else:
-            elemento.coordinacion_lab='Comandancia'
-
-        if 1< len(ancestro):
-            elemento.subdireccion_lab=ancestro[1].nombre_cto
-        else:
-            elemento.subdireccion_lab='Comandancia'
-
-        if 2< len(ancestro):
-            elemento.region_lab=ancestro[2].nombre_cto
-        else:
-            elemento.region_lab='Comandancia'
-
-        if 3< len(ancestro):
-            elemento.agrupamiento_lab=ancestro[3].nombre_cto
-        else:
-            elemento.agrupamiento_lab='Comandancia'
 
 
-class ElementoManager(models.Manager):
-        def reconstruir_adscripcion_path(self):
+class ManagerElemento(models.Manager):
+        def reconstruir_campos(self):
             elementos = self.all()
             for e in elementos:
-                MixinElemento.detallar_adscripcion(e)
                 e.save()
 
 @python_2_unicode_compatible
@@ -65,31 +18,78 @@ class Elemento (models.Model):
     nombre = models.CharField(max_length=255)
     adscripcion = models.ForeignKey(Adscripcion, related_name='elementos_adscritos')
     laborando_en = models.ForeignKey(Adscripcion, related_name='elementos_laborando_aqui')
+    coordinacion = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
+    subdireccion = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
+    region = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
+    agrupamiento = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
+    coordinacion_lab = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
+    subdireccion_lab = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
+    region_lab = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
+    agrupamiento_lab = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
+    de_apoyo = models.BooleanField(default=False) #campo calculado antes de guardar
 
-    objects = models.Manager()
-    Emanager=ElementoManager()
 
-    """
-        Estos camps son autogenerados en base a los ancestros del campo adscripcion
-        y representan la adscripcion oficial del elemento.
-    """
-    coordinacion = models.CharField(max_length=60, blank=True)
-    subdireccion = models.CharField(max_length=60, blank=True)
-    region = models.CharField(max_length=60, blank=True)
-    agrupamiento = models.CharField(max_length=60, blank=True)
+    objects = ManagerElemento()
 
-    """
-        Estos campost tambien son autogenerados en base a los ancestros del campo
-        laborando_en y representan en donde se encuentra laborando fisicamente
-        el elemento.
-    """
-    coordinacion_lab = models.CharField(max_length=60, blank=True)
-    subdireccion_lab = models.CharField(max_length=60, blank=True)
-    region_lab = models.CharField(max_length=60, blank=True)
-    agrupamiento_lab = models.CharField(max_length=60, blank=True)
+    #Esta funcion es horrible pero no he encotrado una forma de hacerla mas elegante
+    def detallar_adscripcion(self):
+        ancestros=self.adscripcion.get_ancestors(include_self=True)
+        if 0< len(ancestros):
+            self.coordinacion=ancestros[0].nombre_cto
+        else:
+            self.coordinacion='Comandancia'
+
+        if 1< len(ancestros):
+            self.subdireccion=ancestros[1].nombre_cto
+        elif len(ancestros)==1:
+            self.subdireccion=ancestros[0].nombre_cto
+        else:
+            self.subdireccion='Comandancia'
+
+        if 2< len(ancestros):
+            self.region=ancestros[2].nombre_cto
+        else:
+            self.region='Comandancia'
+
+        if 3< len(ancestros):
+            self.agrupamiento=ancestros[3].nombre_cto
+        else:
+            self.agrupamiento='Comandancia'
+
+        ancestros=self.laborando_en.get_ancestors(include_self=True)
+
+        if 0< len(ancestros):
+            self.coordinacion_lab=ancestros[0].nombre_cto
+        else:
+            self.coordinacion_lab='Comandancia'
+
+        if 1< len(ancestros):
+            self.subdireccion_lab=ancestros[1].nombre_cto
+        elif len(ancestros)==1:
+            self.subdireccion_lab=ancestros[0].nombre_cto
+        else:
+            self.subdireccion_lab='Comandancia'
+
+        if 2< len(ancestros):
+            self.region_lab=ancestros[2].nombre_cto
+        else:
+            self.region_lab='Comandancia'
+
+        if 3< len(ancestros):
+            self.agrupamiento_lab=ancestros[3].nombre_cto
+        else:
+            self.agrupamiento_lab='Comandancia'
+
+
+    def set_de_apoyo(self):
+        if self.adscripcion == self.laborando_en:
+            self.de_apoyo=False
+        else:
+            self.de_apoyo=True
 
     def save(self, *args, **kwargs):
-        MixinElemento.detallar_adscripcion(self)
+        self.detallar_adscripcion()
+        self.set_de_apoyo()
         super(Elemento, self).save(*args,**kwargs)
 
     def __str__(self):
