@@ -1,0 +1,57 @@
+/vagrant/SitiosWeb/CVM  ==>  /var/www/html/CVM/CVM
+
+192.168.33.10
+
+ARCHIVO IPTABLES FIREWALL
+/etc/sysconfig/iptables
+
+iptables -t nat -A PREROUTING -p tcp -i eth0 --dport 80 -j REDIRECT --to-ports 127.0.0.1:9091
+iptables -t nat -A PREROUTING -p tcp -i eth0 --dport 443 -j REDIRECT --to-ports 127.0.0.1:9090
+
+iptables -t nat -A PREROUTING -p tcp -i ppp0 --dport 8001 -j DNAT --to-destination 192.168.1.200:8080
+iptables -A FORWARD -p tcp -d 192.168.1.200 --dport 8080 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+DEFAULT CONFIG IPTABLES
+
+# Firewall configuration written by system-config-firewall
+# Manual customization of this file is not recommended.
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+
+
+
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 8000 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+
+SABER EN QUE PUERTO ESCUCHAN LAS APLICACIONES
+netstat -ntulp
+
+---------------------------------------------------------------------
+GENERAR KEY SSH GITHUB
+
+cd ~/.ssh
+ls -al
+
+ssh-keygen -t rsa -C "your_email@example.com"
+# Creates a new ssh key, using the provided email as a label
+# Generating public/private rsa key pair.
+# Enter file in which to save the key (/c/Users/you/.ssh/id_rsa): [Press enter]
+
+exec ssh-agent bash
+ssh-add ~/.ssh/id_rsa
+ssh -o StrictHostKeyChecking=no git@github.com
+
+clip < ~/.ssh/id_rsa.pub
+# Copies the contents of the id_rsa.pub file to your clipboard
+
+Pegar la clave en GitHub y listo para subir trabajar
+----------------------------------------------------------------------
