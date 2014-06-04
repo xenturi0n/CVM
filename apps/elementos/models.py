@@ -2,6 +2,7 @@
 from django.db import models
 from apps.adscripciones.models import Adscripcion
 from django.utils.encoding import python_2_unicode_compatible
+from mptt.models import TreeForeignKey
 
 #TODO: probar con nombre corto para detallar la adscripcion en lugar de nobre largo
 #Todo: generar un campo automatico para saber si el elemento esta de apoyo
@@ -16,8 +17,8 @@ class ManagerElemento(models.Manager):
 @python_2_unicode_compatible
 class Elemento (models.Model):
     nombre = models.CharField(max_length=255)
-    adscripcion = models.ForeignKey(Adscripcion, related_name='elementos_adscritos')
-    laborando_en = models.ForeignKey(Adscripcion, related_name='elementos_laborando_aqui')
+    adscripcion = TreeForeignKey(Adscripcion, related_name='elementos_adscritos')
+    laborando_en = TreeForeignKey(Adscripcion, related_name='elementos_laborando_aqui')
     coordinacion = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
     subdireccion = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
     region = models.CharField(max_length=60, blank=True) #campo calculado antes de guardar
