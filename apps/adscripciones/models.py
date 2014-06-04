@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from mptt.models import MPTTModel, TreeForeignKey
-from mptt.managers import TreeManager
+#from mptt.managers import TreeManager
 from django.db.models import F
 
 #TODO: agregar manager personalizado para recuperar todos los elementos
@@ -73,7 +73,7 @@ class Adscripcion (MPTTModel):
         fs=self
 
         for sib in sibs:
-            if (sib.lft<fs.lft):
+            if sib.lft<fs.lft:
                 fs = sib
         return fs
 
@@ -82,24 +82,24 @@ class Adscripcion (MPTTModel):
         fs=self
 
         for sib in sibs:
-            if (sib.lft>fs.lft):
+            if sib.lft>fs.lft:
                 fs = sib
         return fs
 
     def mover_abajo(self):
-        if (self.parent_id == None):
+        if None == self.parent_id:
             return None
 
-        if (self.get_next_sibling()):
+        if self.get_next_sibling():
             self.move_to(self.get_next_sibling(), position='right')
         else:
             self.move_to(self.get_first_sibling(), position='left')
 
     def mover_arriba(self):
-        if (self.parent_id == None):
+        if None == self.parent_id:
             return None
 
-        if (self.get_previous_sibling() and self.parent_id>0):
+        if self.get_previous_sibling() and self.parent_id>0:
             self.move_to(self.get_previous_sibling(), position='left')
         else:
             self.move_to(self.get_last_sibling(), position='right')
