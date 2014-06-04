@@ -2,6 +2,7 @@ from django.contrib import admin
 from apps.elementos.models import Elemento
 from django.contrib.admin import ModelAdmin
 
+#Todo: Agregar Filtros, campos de busqueda y mejorar el css del admin
 
 class CustomElementoAdmin(ModelAdmin):
        list_display =('nombre', 'id',
