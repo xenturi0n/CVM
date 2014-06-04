@@ -68,6 +68,7 @@ class Adscripcion (MPTTModel):
     #************************************************************************************
 
     #*** METODOS PARA DESPLAZAR ELEMENTOS DEL ARBOL**************************************
+    #Todo: Modificar para prevenir error en caso de querer mover solo un nodo sin siblings (hermanos)
     def get_first_sibling(self):
         sibs = self.get_siblings(include_self=True)
         fs=self
@@ -95,6 +96,8 @@ class Adscripcion (MPTTModel):
         else:
             self.move_to(self.get_first_sibling(), position='left')
 
+        self.__class__.objects.rebuild()
+
     def mover_arriba(self):
         if None == self.parent_id:
             return None
@@ -104,7 +107,11 @@ class Adscripcion (MPTTModel):
         else:
             self.move_to(self.get_last_sibling(), position='right')
 
+        self.__class__.objects.rebuild()
+
+
     def save(self, *args, **kwargs):
+        self.__class__.objects.rebuild()
         super(Adscripcion, self).save(*args,**kwargs)
         self.elementos_laborando_aqui.model.objects.reconstruir_campos()
         self.elementos_adscritos.model.objects.reconstruir_campos()
