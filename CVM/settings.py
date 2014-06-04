@@ -9,12 +9,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
 from unipath import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-BASE_DIR = Path(__file__).ancestor(3)
-
+BASE_DIR = Path(__file__).ancestor(2)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -28,7 +25,6 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 DJANGO_APPS =(
     'django.contrib.admin',
@@ -44,6 +40,8 @@ THIRD_PARTY_APPS=(
     'django_extensions',
     'django_admin_bootstrapped.bootstrap3',
     'django_admin_bootstrapped',
+    'debug_toolbar',
+
 )
 LOCAL_APPS=(
     'apps.adscripciones',
@@ -61,6 +59,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
 
 ROOT_URLCONF = 'CVM.urls'
 
@@ -99,3 +98,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS=(BASE_DIR.child('public').child('static'),)
+
+#***Estas lineas es para que funcione con VAGRANT
+if DEBUG:
+    from fnmatch import fnmatch
+    class glob_list(list):
+        def __contains__(self, key):
+            for elt in self:
+                if fnmatch(key, elt): return True
+            return False
+
+    INTERNAL_IPS = glob_list(['127.0.0.1', '192.168.*.*'])
