@@ -1,9 +1,14 @@
 from django.contrib import admin
 from .models import Adscripcion, TipoAdscripcion
 from mptt.admin import MPTTModelAdmin
+from CVM import settings
 
+IS_BOOTSTRAPPED_INSTALLED = 'django_admin_bootstrapped' in settings.INSTALLED_APPS
 
 class CustMPTTModelAdmin(MPTTModelAdmin):
+
+
+
     list_display =('nombre_lgo', 'id', 'lft', 'rght', 'parent')
     actions = ['subir_nodo','bajar_nodo']
     mptt_level_indent=20
