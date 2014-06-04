@@ -1,3 +1,7 @@
+usar bootstrap 3 con el admin de django
+https://riccardo.forina.me/bootstrap-your-django-admin-in-3-minutes/
+
+
 modificacion en la branch dev
 /vagrant/SitiosWeb/CVM  ==>  /var/www/html/CVM/CVM
 

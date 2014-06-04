@@ -42,6 +42,8 @@ THIRD_PARTY_APPS=(
     'south',
     'mptt',
     'django_extensions',
+    'django_admin_bootstrapped.bootstrap3',
+    'django_admin_bootstrapped',
 )
 LOCAL_APPS=(
     'apps.adscripciones',
@@ -49,7 +51,7 @@ LOCAL_APPS=(
 )
 
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS =THIRD_PARTY_APPS + DJANGO_APPS  + LOCAL_APPS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
