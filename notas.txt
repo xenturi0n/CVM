@@ -60,3 +60,8 @@ clip < ~/.ssh/id_rsa.pub
 
 Pegar la clave en GitHub y listo para subir trabajar
 ----------------------------------------------------------------------
+
+Cuando aparece esto en git
+remotes/origin/HEAD -> origin/master
+se soluciona con esto
+git remote set-head origin -d
